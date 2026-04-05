@@ -4,13 +4,27 @@
 
 ---
 
+## §0 EverAgent Manifest
+
+```yaml
+agent_manifest:
+  name: "BitmagnetAgent"
+  model: "任意支持文件读写与 git 的模型"
+  capability_level: full_admin
+  git_identity:
+    # name 由运行时动态获取（模型名，如 Claude MiniMax-M2.7）
+    # 提交前确保 git config user.name 非空即可，无需匹配预定义列表
+    email: "noreply@bitmagnetagent.ai"
+```
+
 ## §0 Git 初始化
 
 ```bash
 GITHUB_TOKEN=$(grep GITHUB_TOKEN .env | cut -d'"' -f2)
 git remote set-url origin https://${GITHUB_TOKEN}@github.com/Everloster/bitmagnet.git
 git ls-remote origin HEAD          # 验权，失败则停止
-git config user.email "noreply@everagent.ai"
+git config user.email "noreply@bitmagnetagent.ai"
+git config user.name "<{你的名字} {模型名}>" # user.name 由运行时自动设置（模型名），提交前检查 git config user.name 非空即可，比如 Claude MiniMax-M2.7
 ```
 
 ---
