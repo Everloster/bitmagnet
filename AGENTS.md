@@ -150,40 +150,33 @@ grep -n "DROP\|ALTER\|TRUNCATE" migrations/*.sql
 
 ### 环境要求
 
-- Go 1.23+
-- Docker (用于 PostgreSQL)
+- Docker & Docker Compose
 - Node.js 18+ (用于 WebUI)
 
 ### 快速启动
 
-`start.sh` 会自动检查并启动 PostgreSQL (Docker)，然后运行 bitmagnet：
-
 ```bash
-./start.sh
+docker-compose up -d
 ```
 
 访问：
 - WebUI: http://localhost:3333/webui/
 - GraphQL API: http://localhost:3333/graphql
 
-### 手动启动
+### 常用命令
 
 ```bash
-# 1. 启动 PostgreSQL
-docker run -d --name bitmagnet-postgres \
-  -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_DB=bitmagnet \
-  -v $(pwd)/data/db:/var/lib/postgresql/data \
-  -p 5432:5432 \
-  --shm-size=2g \
-  postgres:16-alpine
+# 启动
+docker-compose up -d
 
-# 2. 编译
-go build -o bitmagnet .
+# 查看日志
+docker-compose logs -f
 
-# 3. 运行
-source .env
-./bitmagnet worker run --keys=http_server --keys=queue_server --keys=dht_crawler
+# 停止
+docker-compose down
+
+# 重新构建并启动
+docker-compose up -d --build
 ```
 
 ### 环境变量 (.env)
