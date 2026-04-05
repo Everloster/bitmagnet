@@ -13,9 +13,9 @@ services:
       - "3334:3334/udp"
     restart: unless-stopped
     environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PASSWORD=postgres
-      - BITMAGNET_POSTGRES=postgres://postgres:postgres@postgres:5432/bitmagnet?sslmode=disable
+      - POSTGRES_HOST=${POSTGRES_HOST:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - BITMAGNET_POSTGRES=postgres://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/bitmagnet?sslmode=disable
       - TMDB_API_KEY=${TMDB_API_KEY:-}
       - BITMAGNET_DHT_CRAWLER_BOOTSTRAP_NODES=${BITMAGNET_DHT_CRAWLER_BOOTSTRAP_NODES:-router.utorrent.com:6881,dht.aelitis.com:6881,router.bittorrent.com:6881,dht.transmissionbt.com:6881}
       - LOG_FILE_ROTATOR_ENABLED=true
@@ -39,9 +39,9 @@ services:
     shm_size: 2g
     restart: unless-stopped
     environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=bitmagnet
-      - PGUSER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-bitmagnet}
+      - PGUSER=${POSTGRES_USER:-postgres}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 10s
