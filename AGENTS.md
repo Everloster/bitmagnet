@@ -1,49 +1,61 @@
-# Bitmagnet — AI 协作规范 v1.2
+# Bitmagnet — AI 协作规范
 
 > 本项目 fork 自 [bitmagnet-io/bitmagnet](https://github.com/bitmagnet-io/bitmagnet)，遵守 MIT 协议。
 
 ---
 
-## §0 EverAgent Manifest
-
-```yaml
-agent_manifest:
-  name: "BitmagnetAgent"
-  model: "任意支持文件读写与 git 的模型"
-  capability_level: full_admin
-  git_identity:
-    # name 由运行时动态获取（模型名，如 Claude MiniMax-M2.7）
-    # 提交前确保 git config user.name 非空即可，无需匹配预定义列表
-    email: "noreply@bitmagnetagent.ai"
-```
-
-## §0 Git 初始化
+## 1. Git 初始化
 
 ```bash
+# 设置远程仓库（使用 .env 中的 TOKEN）
 GITHUB_TOKEN=$(grep GITHUB_TOKEN .env | cut -d'"' -f2)
 git remote set-url origin https://${GITHUB_TOKEN}@github.com/Everloster/bitmagnet.git
-git ls-remote origin HEAD          # 验权，失败则停止
+git ls-remote origin HEAD
+
+# 配置提交者身份
 git config user.email "noreply@bitmagnetagent.ai"
-git config user.name "<{你的名字} {模型名}>" # user.name 由运行时自动设置（模型名），提交前检查 git config user.name 非空即可，比如 Claude MiniMax-M2.7
+git config user.name "<你的名字> <模型名>"
 ```
 
 ---
 
-## §1 分支策略
+## 2. 分支与提交流程
 
 ```
-main    → 主分支，直接提交和推送
+main → 主分支，直接提交和推送
 ```
+
+```bash
+# 开发并提交
+git add <files>
+git commit -m "[feat] scope: 描述
+
+Agent: Claude
+Task-Type: feat"
+
+git push origin main
+```
+
+### 提交约束钩子
+
+首次 clone 后启用：
+```bash
+ln -sf ../../scripts/commit-msg .git/hooks/commit-msg
+```
+
+提交信息必须包含 `Agent:` 和 `Task-Type:` 字段。
 
 ---
 
-## §2 Commit Message 格式
+## 3. 提交规范
+
+### 格式
 
 ```
 [{type}] {scope}: {描述}
 
 Agent: {model name}
-Task-Type: {feat | fix | docs | refactor | perf | chore}
+Task-Type: {type}
 ```
 
 ### Type 分类
@@ -57,57 +69,18 @@ Task-Type: {feat | fix | docs | refactor | perf | chore}
 | `perf` | 性能优化 |
 | `chore` | 构建/工具变更 |
 
-### 完整示例
+### 示例
 
 ```
 [feat] classifier: 添加新的内容类型识别规则
 
-Agent: Claude
+Agent: Claude MiniMax-M2.7
 Task-Type: feat
-
-BREAKING CHANGE: 分类器返回值结构变更
-Closes: #123
-```
-
-### 提交约束钩子
-
-提交信息必须包含 `Agent:` 和 `Task-Type:` 字段，否则提交将被拒绝。
-
-首次 clone 后启用钩子：
-```bash
-ln -sf ../../scripts/commit-msg .git/hooks/commit-msg
 ```
 
 ---
 
-## §3 提交推送流程
-
-```bash
-# 1. 确保在 main 分支
-git checkout main
-
-# 2. 开发并提交
-git add -A
-git commit -m "[feat] scope: 添加新功能
-
-Agent: Claude
-Task-Type: feat"
-
-# 3. 推送到远程
-git push origin main
-```
-
----
-
-## §4 代码贡献流程
-
-```
-1. 在 main 分支开发
-2. 运行安全检查清单（见 §5）
-3. 提交并推送到 main
-```
-
-审查代码时重点关注：
+## 4. 代码审查清单
 
 ### 功能性
 - [ ] 功能是否符合需求
@@ -127,90 +100,110 @@ git push origin main
 ### 测试
 - [ ] 新功能有测试覆盖
 - [ ] 边界条件有测试
-- [ ] 测试可重复执行
 
 ---
 
-## §5 安全检查清单
-
-**提交前必须通过以下所有检查**：
+## 5. 安全检查
 
 ### 敏感信息扫描
 
 ```bash
-# 扫描硬编码的敏感信息（Go）
+# 扫描硬编码的敏感信息
 grep -rn "password\|secret\|api_key\|token\|private_key\|GITHUB_TOKEN" \
-  --include="*.go" --include="*.ts" --include="*.js" \
+  --include="*.go" --include="*.ts" \
   --exclude-dir=vendor --exclude-dir=node_modules .
-
-# 扫描可疑的日志输出
-grep -rn "fmt\.Print\|log\.\|console\." \
-  --include="*.go" --include="*.ts" internal/
 ```
 
 ### Go 依赖安全
 
 ```bash
-# 验证依赖完整性
 go mod verify
-
-# 安全扫描（如有 gosec）
 gosec ./...
-
-# 检查是否有已知漏洞
 go vulncheck ./...
 ```
 
-### 前端依赖安全（WebUI）
+### 前端依赖安全
 
 ```bash
-cd webui
-npm audit --audit-level=moderate
+cd webui && npm audit --audit-level=moderate
 ```
 
 ### 数据库迁移检查
 
 ```bash
-# 确保迁移文件语法正确
-# 检查是否有破坏性变更
 grep -n "DROP\|ALTER\|TRUNCATE" migrations/*.sql
 ```
 
 ---
 
-## §6 敏感信息处理规范
+## 6. 敏感信息处理
 
-### 环境变量
-
-- 所有运行时 secrets 必须通过环境变量注入
-- 禁止将 secrets 硬编码或写入配置文件
-- 提供 `.env.example` 模板（仅包含变量名，无实际值）
-
-### 日志规范
-
-- 禁止在日志中输出用户密码、Token、API Key
-- 敏感数据字段用 `***` 脱敏
-- 请求/响应日志需配置脱敏规则
-
-### 内存安全
-
-- 密码等敏感数据使用后及时清零
-- 避免在日志或错误信息中暴露敏感内容
-- 使用 `crypto/subtle` 处理敏感比较
-
-### 数据库
-
-- 密码字段必须加密存储
-- 禁止在 SQL 中拼接用户输入（使用参数化查询）
-- 敏感操作需记录审计日志
+- 所有 secrets 必须通过环境变量或 `.env` 注入
+- 禁止将 secrets 硬编码到代码或配置文件
+- `.env` 不得提交到仓库
+- 日志中禁止输出密码、Token、API Key
+- 数据库操作使用参数化查询
 
 ---
 
-## §7 安全铁律
+## 7. 本地开发
 
-1. **Token 安全**：`.env` 绝不可提交；commit message 中不得暴露 token
-2. **敏感信息**：API Key、密码、密钥等禁止提交
-3. **数据目录**：`data/` 目录已加入 .gitignore，不得提交
-4. **二进制文件**：`bitmagnet` 二进制文件已加入 .gitignore，不得提交
-5. **依赖安全**：依赖更新必须经过安全扫描
-6. **CI 必须**：所有 PR 必须通过自动化安全检查
+### 环境要求
+
+- Go 1.23+
+- Docker (用于 PostgreSQL)
+- Node.js 18+ (用于 WebUI)
+
+### 快速启动
+
+`start.sh` 会自动检查并启动 PostgreSQL (Docker)，然后运行 bitmagnet：
+
+```bash
+./start.sh
+```
+
+访问：
+- WebUI: http://localhost:3333/webui/
+- GraphQL API: http://localhost:3333/graphql
+
+### 手动启动
+
+```bash
+# 1. 启动 PostgreSQL
+docker run -d --name bitmagnet-postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=bitmagnet \
+  -v $(pwd)/data/db:/var/lib/postgresql/data \
+  -p 5432:5432 \
+  --shm-size=2g \
+  postgres:16-alpine
+
+# 2. 编译
+go build -o bitmagnet .
+
+# 3. 运行
+source .env
+./bitmagnet worker run --keys=http_server --keys=queue_server --keys=dht_crawler
+```
+
+### 环境变量 (.env)
+
+参考 `.env.example` 创建 `.env`：
+
+```
+POSTGRES_HOST=localhost
+POSTGRES_PASSWORD=postgres
+TMDB_API_KEY=<你的-tmdb-api-key>
+```
+
+> 注意：`GITHUB_TOKEN` 等敏感信息不应提交到仓库
+
+---
+
+## 8. 安全铁律
+
+1. **`.env` 绝不可提交**
+2. **API Key、密码、密钥等敏感信息禁止提交**
+3. **commit message 中不得暴露 token**
+4. **依赖更新必须经过安全扫描**
+5. **数据目录 `data/` 不得提交**

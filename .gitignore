@@ -1,12 +1,12 @@
 .env
 .env.*
+!.env.example
 .direnv
 .idea
 /data
 /bitmagnet
 /bitmagnet.io/_site
 /export.sql
-start.sh
 .env.local
 dump.rdb
 .jekyll-cache
