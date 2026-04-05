@@ -29,6 +29,47 @@ services:
       - --keys=queue_server
       - --keys=dht_crawler
 
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: bitmagnet-postgres-exporter
+    restart: unless-stopped
+    environment:
+      - DATA_SOURCE_NAME=postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/bitmagnet?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: bitmagnet-prometheus
+    volumes:
+      - ./observability/prometheus.config.yaml:/etc/prometheus/prometheus.yml
+      - ./data/prometheus:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    depends_on:
+      - bitmagnet
+      - postgres-exporter
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: bitmagnet-grafana
+    volumes:
+      - ./observability/grafana.datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./observability/grafana.dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./observability/grafana-dashboards:/etc/dashboards
+      - ./data/grafana:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    depends_on:
+      - prometheus
+
   postgres:
     image: postgres:16-alpine
     container_name: bitmagnet-postgres

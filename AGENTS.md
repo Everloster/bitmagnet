@@ -13,9 +13,13 @@ git remote set-url origin https://${GITHUB_TOKEN}@github.com/Everloster/bitmagne
 git ls-remote origin HEAD
 
 # 配置提交者身份（每次切换 AI Agent 时需重新执行）
-git config user.email "noreply@bitmagnetagent.ai"
 git config user.name "<模型名>"
 # 示例：Claude Sonnet 4.6 / MiniMax-M2.7 / GPT-4o
+#
+# 邮箱按模型选择（GitHub 会据此显示对应头像）：
+# Claude → noreply@anthropic.com
+# 其他模型 → noreply@bitmagnetagent.ai
+git config user.email "noreply@anthropic.com"
 ```
 
 ---
