@@ -69,6 +69,15 @@ BREAKING CHANGE: 分类器返回值结构变更
 Closes: #123
 ```
 
+### 提交约束钩子
+
+提交信息必须包含 `Agent:` 和 `Task-Type:` 字段，否则提交将被拒绝。
+
+首次 clone 后启用钩子：
+```bash
+ln -sf ../../scripts/commit-msg .git/hooks/commit-msg
+```
+
 ---
 
 ## §3 提交推送流程

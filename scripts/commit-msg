@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Bitmagnet AI 协作规范检查钩子
+# 验证提交信息包含 Agent 和 Task-Type 字段
+
+COMMIT_MSG=$(cat "$1")
+
+if ! echo "$COMMIT_MSG" | grep -q "Agent:"; then
+    echo "错误: 提交信息缺少 'Agent:' 字段"
+    echo "规范格式:"
+    echo "  [type] scope: 描述"
+    echo ""
+    echo "  Agent: <模型名>"
+    echo "  Task-Type: <类型>"
+    exit 1
+fi
+
+if ! echo "$COMMIT_MSG" | grep -q "Task-Type:"; then
+    echo "错误: 提交信息缺少 'Task-Type:' 字段"
+    echo "规范格式:"
+    echo "  [type] scope: 描述"
+    echo ""
+    echo "  Agent: <模型名>"
+    echo "  Task-Type: <类型>"
+    exit 1
+fi
+
+exit 0
