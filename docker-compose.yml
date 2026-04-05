@@ -17,8 +17,12 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
       - BITMAGNET_POSTGRES=postgres://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/bitmagnet?sslmode=disable
       - TMDB_API_KEY=${TMDB_API_KEY:-}
-      - BITMAGNET_DHT_CRAWLER_BOOTSTRAP_NODES=${BITMAGNET_DHT_CRAWLER_BOOTSTRAP_NODES:-router.utorrent.com:6881,dht.aelitis.com:6881,router.bittorrent.com:6881,dht.transmissionbt.com:6881}
+      - DHT_CRAWLER_BOOTSTRAP_NODES=${DHT_CRAWLER_BOOTSTRAP_NODES:-router.utorrent.com:6881,router.bittorrent.com:6881,dht.transmissionbt.com:6881,dht.aelitis.com:6881,dht.libtorrent.org:25401}
+      - DHT_CRAWLER_SCALING_FACTOR=${DHT_CRAWLER_SCALING_FACTOR:-15}
       - LOG_FILE_ROTATOR_ENABLED=true
+      - HTTP_PROXY=http://host.docker.internal:7897
+      - HTTPS_PROXY=http://host.docker.internal:7897
+      - NO_PROXY=postgres,localhost,127.0.0.1
     depends_on:
       postgres:
         condition: service_healthy

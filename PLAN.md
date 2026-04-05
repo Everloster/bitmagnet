@@ -33,13 +33,13 @@
   - `grafana`：使用已有的 `observability/grafana.datasources.yaml` + `grafana.dashboards.yaml` + `grafana-dashboards/bitmagnet.json`
   - `postgres-exporter`：暴露 PostgreSQL 指标给 Prometheus 采集
 - **验证**：`docker compose up -d`，访问 http://localhost:3000 查看 Grafana 仪表板
-- **状态**：`[ ]`
+- **状态**：`[x]` 已完成（commit b70e586）
 
 ### Task 1.2 — 确认 Grafana 仪表板显示爬虫指标
 - **目标**：验证 Grafana 能正确显示 `bitmagnet_dht_crawler_persisted_total` 等指标
 - **操作**：打开 Grafana → Dashboards → Bitmagnet，观察数据是否正常
 - **验证**：至少能看到 DHT 路由表节点数、metainfo 请求指标
-- **状态**：`[ ]`
+- **状态**：`[x]` 监控链路完整，bitmagnet 已启动，指标正常上报
 
 ---
 
@@ -56,14 +56,14 @@
   - `requestMetaInfo` goroutine：400 → 600
   - `nodesForFindNode` / `SampleInfoHashes`：各 100 → 150 goroutine
 - **验证**：重启容器，10 分钟后对比 `torrents` 表入库速率
-- **状态**：`[ ]`
+- **状态**：`[x]` 已设置（同时修复了环境变量前缀 bug：`BITMAGNET_` → 无前缀）
 
 ### Task 2.2 — 增加 Bootstrap 节点
 - **目标**：增加 2 个额外的 DHT bootstrap 节点，加速节点发现
 - **改动文件**：`docker-compose.yml`（环境变量 `BITMAGNET_DHT_CRAWLER_BOOTSTRAP_NODES`）
 - **新增节点**：`dht.libtorrent.org:25401`、`router.silotis.us:6881`
 - **验证**：查看 `bitmagnet_dht_ktable_nodes_count` 指标，节点数应有提升
-- **状态**：`[ ]`
+- **状态**：`[x]` 已完成（同时移除失效节点 router.silotis.us，加入 dht.libtorrent.org:25401）
 
 ### Task 2.3 — 根据监控调整 Metainfo 速率限制（可选）
 - **目标**：如果发现 `bitmagnet_meta_info_requester_error_total` 很低，考虑放宽速率
