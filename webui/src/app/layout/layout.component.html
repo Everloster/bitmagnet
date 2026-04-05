@@ -102,32 +102,18 @@
       <mat-icon svgIcon="external-link" />
     </button>
     <mat-menu #externalLinksMenu="matMenu" class="layout-header-menu">
-      <a mat-menu-item href="https://bitmagnet.io" target="_blank"
-        >bitmagnet.io</a
-      >
-      <a mat-menu-item href="https://discord.gg/6mFNszX8qM" target="_blank">{{
-        t("layout.bitmagnet_on_service", { service: "Discord" })
-      }}</a>
       <a
         mat-menu-item
-        href="https://github.com/bitmagnet-io/bitmagnet"
+        href="https://github.com/Everloster/bitmagnet"
         target="_blank"
-        >{{ t("layout.bitmagnet_on_service", { service: "GitHub" }) }}</a
-      >
-      <a
-        mat-menu-item
-        href="https://opencollective.com/bitmagnet"
-        target="_blank"
-        >{{
-          t("layout.bitmagnet_on_service", { service: "OpenCollective" })
-        }}</a
+        >GitHub</a
       >
     </mat-menu>
     @if (!breakpoints.sizeAtLeast("Medium")) {
       <a
         mat-icon-button
         class="button-sponsor"
-        href="https://opencollective.com/bitmagnet"
+        href="https://github.com/Everloster/bitmagnet"
         target="_blank"
         [matTooltip]="t('layout.sponsor')"
         ><mat-icon>favorite</mat-icon></a
@@ -136,7 +122,7 @@
       <a
         mat-button
         class="button-sponsor"
-        href="https://opencollective.com/bitmagnet"
+        href="https://github.com/Everloster/bitmagnet"
         target="_blank"
         [matTooltip]="t('layout.support_bitmagnet')"
         ><mat-icon>favorite</mat-icon>{{ t("layout.sponsor") }}</a
