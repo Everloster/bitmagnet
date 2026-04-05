@@ -6,6 +6,8 @@
 /bitmagnet
 /bitmagnet.io/_site
 /export.sql
+start.sh
+.env.local
 dump.rdb
 .jekyll-cache
 .sass-cache
