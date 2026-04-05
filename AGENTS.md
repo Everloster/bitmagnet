@@ -12,9 +12,10 @@ GITHUB_TOKEN=$(grep GITHUB_TOKEN .env | cut -d'"' -f2)
 git remote set-url origin https://${GITHUB_TOKEN}@github.com/Everloster/bitmagnet.git
 git ls-remote origin HEAD
 
-# 配置提交者身份
+# 配置提交者身份（每次切换 AI Agent 时需重新执行）
 git config user.email "noreply@bitmagnetagent.ai"
-git config user.name "<你的名字> <模型名>"
+git config user.name "<模型名>"
+# 示例：Claude Sonnet 4.6 / MiniMax-M2.7 / GPT-4o
 ```
 
 ---
@@ -74,7 +75,7 @@ Task-Type: {type}
 ```
 [feat] classifier: 添加新的内容类型识别规则
 
-Agent: Claude MiniMax-M2.7
+Agent: Claude Sonnet 4.6
 Task-Type: feat
 ```
 
