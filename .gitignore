@@ -43,3 +43,8 @@ testem.log
 .DS_Store
 Thumbs.db
 /webui/dist
+
+# Secrets & VPN
+*.pem
+wg0.conf
+wireguard/

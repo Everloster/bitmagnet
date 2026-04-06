@@ -1,30 +1,72 @@
 services:
+  # WireGuard over WebSocket：把 WireGuard UDP 封装进 TCP，绕过 Docker Desktop VPNKit 的 UDP 限制
+  wstunnel:
+    image: ghcr.io/erebe/wstunnel:v10.1.4
+    container_name: bitmagnet-wstunnel
+    restart: unless-stopped
+    command:
+      - /home/app/wstunnel
+      - client
+      - -L
+      - "udp://0.0.0.0:51820:127.0.0.1:51820"
+      - "ws://${WSTUNNEL_SERVER_IP}:${WSTUNNEL_SERVER_PORT:-8080}"
+    networks:
+      bitmagnet-net:
+        ipv4_address: 192.168.55.9
+
+  gluetun:
+    image: qmcgaw/gluetun:latest
+    container_name: bitmagnet-gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - "3333:3333"
+      - "3334:3334/tcp"
+      - "3334:3334/udp"
+    environment:
+      - VPN_SERVICE_PROVIDER=custom
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_PUBLIC_KEY=${WIREGUARD_PUBLIC_KEY}
+      # 连接 wstunnel 客户端（同网络内），而不是直接连 VPS UDP
+      - WIREGUARD_ENDPOINT_IP=192.168.55.9
+      - WIREGUARD_ENDPOINT_PORT=51820
+      - WIREGUARD_ADDRESSES=10.0.0.2/24
+      - DOT=off
+      - DNS_ADDRESS=8.8.8.8
+    extra_hosts:
+      - "postgres:192.168.55.11"
+    restart: always
+    depends_on:
+      - wstunnel
+    networks:
+      bitmagnet-net:
+        ipv4_address: 192.168.55.10
+
   bitmagnet:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: bitmagnet
+    network_mode: service:gluetun
     volumes:
       - ./data/db:/data/db
       - ./data/bitmagnet:/data/bitmagnet
-    ports:
-      - "3333:3333"
-      - "3334:3334/tcp"
-      - "3334:3334/udp"
     restart: unless-stopped
     environment:
-      - POSTGRES_HOST=${POSTGRES_HOST:-postgres}
+      - POSTGRES_HOST=postgres
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
       - BITMAGNET_POSTGRES=postgres://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/bitmagnet?sslmode=disable
       - TMDB_API_KEY=${TMDB_API_KEY:-}
-      - DHT_CRAWLER_BOOTSTRAP_NODES=${DHT_CRAWLER_BOOTSTRAP_NODES:-router.utorrent.com:6881,router.bittorrent.com:6881,dht.transmissionbt.com:6881,dht.aelitis.com:6881,dht.libtorrent.org:25401}
+      - DHT_CRAWLER_BOOTSTRAP_NODES=${DHT_CRAWLER_BOOTSTRAP_NODES:-dht.transmissionbt.com:6881,dht.libtorrent.org:25401,87.98.162.88:6881}
       - DHT_CRAWLER_SCALING_FACTOR=${DHT_CRAWLER_SCALING_FACTOR:-15}
       - LOG_FILE_ROTATOR_ENABLED=true
-      - HTTP_PROXY=http://host.docker.internal:7897
-      - HTTPS_PROXY=http://host.docker.internal:7897
-      - NO_PROXY=postgres,localhost,127.0.0.1
     depends_on:
       postgres:
+        condition: service_healthy
+      gluetun:
         condition: service_healthy
     command:
       - worker
@@ -42,10 +84,14 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - bitmagnet-net
 
   prometheus:
     image: prom/prometheus:latest
     container_name: bitmagnet-prometheus
+    extra_hosts:
+      - "bitmagnet:192.168.55.10"
     volumes:
       - ./observability/prometheus.config.yaml:/etc/prometheus/prometheus.yml
       - ./data/prometheus:/prometheus
@@ -55,6 +101,8 @@ services:
     depends_on:
       - bitmagnet
       - postgres-exporter
+    networks:
+      - bitmagnet-net
 
   grafana:
     image: grafana/grafana:latest
@@ -73,6 +121,8 @@ services:
       - GF_AUTH_DISABLE_LOGIN_FORM=true
     depends_on:
       - prometheus
+    networks:
+      - bitmagnet-net
 
   postgres:
     image: postgres:16-alpine
@@ -81,7 +131,7 @@ services:
       - ./data/db:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    shm_size: 2g
+    shm_size: 1g
     restart: unless-stopped
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
@@ -91,3 +141,15 @@ services:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 10s
       start_period: 20s
+    networks:
+      bitmagnet-net:
+        ipv4_address: 192.168.55.11
+
+networks:
+  bitmagnet-net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.55.0/24
+          gateway: 192.168.55.1
