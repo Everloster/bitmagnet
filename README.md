@@ -107,6 +107,7 @@ iptables -A FORWARD -i <iface> -o wg0 -p tcp --dport 3334 -j ACCEPT
 │   └── worker/          # Worker 系统
 ├── graphql/             # GraphQL schema 定义
 ├── migrations/          # 数据库迁移
+├── dht-check/           # DHT Bootstrap 节点检查工具
 └── webui/              # Angular 前端
 ```
 
@@ -133,6 +134,24 @@ iptables -A FORWARD -i <iface> -o wg0 -p tcp --dport 3334 -j ACCEPT
 - `dht_crawler` - DHT 爬虫
 
 使用 `--all` 启动所有 worker，或使用 `--keys` 指定特定 worker。
+
+## 工具
+
+### DHT Bootstrap 节点检查
+
+检查和维护 DHT bootstrap 节点的可用性，支持通过 VPS SSH 或本地验证。
+
+```bash
+# 通过 VPS SSH 验证（推荐，不受本地代理影响）
+python3 dht-check/verify.py
+
+# 本地验证
+python3 dht-check/verify.py --local
+```
+
+节点数据维护在 `dht-check/dht-bootstrap-nodes.json`，包含每个节点的状态、来源和最后验证时间。
+
+如果使用 Claude Code，可直接运行 `/dht-check` 执行完整的搜索 + 验证流程。
 
 ## License
 

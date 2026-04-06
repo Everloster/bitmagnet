@@ -198,7 +198,32 @@ TMDB_API_KEY=<你的-tmdb-api-key>
 
 ---
 
-## 8. 安全铁律
+## 8. 自定义技能（Slash Commands）
+
+### `/dht-check` — DHT Bootstrap 节点检查
+
+搜索、发现并验证 DHT bootstrap 节点的可用性。
+
+**功能：**
+1. 从 GitHub 主流 BT 客户端和 web 搜索收集 DHT bootstrap 节点
+2. 通过 VPS SSH 发送真实 DHT ping 验证节点可用性（回退到本地验证）
+3. 更新 `dht-check/dht-bootstrap-nodes.json` 记录验证结果
+4. 输出建议的 `DHT_CRAWLER_BOOTSTRAP_NODES` 值
+
+**相关文件：**
+- `dht-check/dht-bootstrap-nodes.json` — 节点数据（状态、来源、验证时间）
+- `dht-check/verify.py` — 验证脚本（支持 `--local` 和 VPS SSH 两种模式）
+- `.claude/commands/dht-check.md` — 技能定义
+
+**手动验证：**
+```bash
+python3 dht-check/verify.py          # 通过 VPS SSH 验证
+python3 dht-check/verify.py --local  # 本地验证
+```
+
+---
+
+## 9. 安全铁律
 
 1. **`.env` 绝不可提交**
 2. **API Key、密码、密钥等敏感信息禁止提交**

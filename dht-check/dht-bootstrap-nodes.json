@@ -1,0 +1,129 @@
+{
+  "auto_update_env": false,
+  "last_scan": "2026-04-06T13:04:32",
+  "scan_method": "vps",
+  "nodes": [
+    {
+      "host": "router.bittorrent.com",
+      "port": 6881,
+      "source": "upstream-default",
+      "description": "BitTorrent official",
+      "status": "dead",
+      "last_verified": "2026-04-06",
+      "verified_from": "vps"
+    },
+    {
+      "host": "router.utorrent.com",
+      "port": 6881,
+      "source": "upstream-default",
+      "description": "uTorrent official",
+      "status": "dead",
+      "last_verified": "2026-04-06",
+      "verified_from": "vps"
+    },
+    {
+      "host": "dht.transmissionbt.com",
+      "port": 6881,
+      "source": "upstream-default",
+      "description": "Transmission official",
+      "status": "alive",
+      "last_verified": "2026-04-06",
+      "verified_from": "vps",
+      "resolved_ip": "87.98.162.88"
+    },
+    {
+      "host": "dht.libtorrent.org",
+      "port": 25401,
+      "source": "upstream-default",
+      "description": "libtorrent (qBittorrent/Deluge)",
+      "status": "alive",
+      "last_verified": "2026-04-06",
+      "verified_from": "vps",
+      "resolved_ip": "185.157.221.247"
+    },
+    {
+      "host": "dht.aelitis.com",
+      "port": 6881,
+      "source": "upstream-default",
+      "description": "Vuze/Azureus",
+      "status": "dead",
+      "last_verified": "2026-04-06",
+      "verified_from": "vps"
+    },
+    {
+      "host": "router.silotis.us",
+      "port": 6881,
+      "source": "upstream-default",
+      "description": "IPv6 bootstrap",
+      "status": "dns_fail",
+      "last_verified": "2026-04-06",
+      "verified_from": "vps"
+    },
+    {
+      "host": "dht.anacrolix.link",
+      "port": 42069,
+      "source": "github:anacrolix/dht",
+      "description": "anacrolix DHT library bootstrap",
+      "status": "dns_fail",
+      "last_verified": "2026-04-06",
+      "verified_from": "vps"
+    },
+    {
+      "host": "router.bittorrent.cloud",
+      "port": 42069,
+      "source": "github:anacrolix/dht",
+      "description": "BitTorrent cloud bootstrap",
+      "status": "dns_fail",
+      "last_verified": "2026-04-06",
+      "verified_from": "vps"
+    },
+    {
+      "host": "router.magnets.im",
+      "port": 6881,
+      "source": "github:80000v/DHT_BOOTSTRAP_NODES",
+      "description": "magnets.im bootstrap",
+      "status": "dns_fail",
+      "last_verified": "2026-04-06",
+      "verified_from": "vps"
+    },
+    {
+      "host": "router.bitcomet.com",
+      "port": 6881,
+      "source": "github:80000v/DHT_BOOTSTRAP_NODES",
+      "description": "BitComet bootstrap",
+      "status": "dns_fail",
+      "last_verified": "2026-04-06",
+      "verified_from": "vps"
+    },
+    {
+      "host": "87.98.162.88",
+      "port": 6881,
+      "source": "ip-fallback",
+      "description": "dht.transmissionbt.com resolved IP",
+      "status": "alive",
+      "last_verified": "2026-04-06",
+      "verified_from": "vps",
+      "resolved_ip": "87.98.162.88"
+    },
+    {
+      "host": "185.157.221.247",
+      "port": 25401,
+      "source": "ip-fallback",
+      "description": "dht.libtorrent.org resolved IP",
+      "status": "alive",
+      "last_verified": "2026-04-06",
+      "verified_from": "vps",
+      "resolved_ip": "185.157.221.247"
+    },
+    {
+      "host": "185.21.216.160",
+      "port": 6881,
+      "source": "web-search",
+      "description": "Community known node",
+      "status": "alive",
+      "last_verified": "2026-04-06",
+      "verified_from": "vps",
+      "resolved_ip": "185.21.216.160"
+    }
+  ]
+}
