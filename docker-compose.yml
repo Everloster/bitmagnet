@@ -60,7 +60,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
       - BITMAGNET_POSTGRES=postgres://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/bitmagnet?sslmode=disable
       - TMDB_API_KEY=${TMDB_API_KEY:-}
-      - DHT_CRAWLER_BOOTSTRAP_NODES=${DHT_CRAWLER_BOOTSTRAP_NODES:-dht.transmissionbt.com:6881,dht.libtorrent.org:25401,87.98.162.88:6881}
+      - DHT_CRAWLER_BOOTSTRAP_NODES=${DHT_CRAWLER_BOOTSTRAP_NODES:-router.bittorrent.com:6881,router.utorrent.com:6881,dht.transmissionbt.com:6881,dht.aelitis.com:6881,router.silotis.us:6881,dht.libtorrent.org:25401}
       - DHT_CRAWLER_SCALING_FACTOR=${DHT_CRAWLER_SCALING_FACTOR:-15}
       - LOG_FILE_ROTATOR_ENABLED=true
     depends_on:
