@@ -8,7 +8,7 @@ services:
       - /home/app/wstunnel
       - client
       - -L
-      - "udp://0.0.0.0:51820:127.0.0.1:51820"
+      - "udp://0.0.0.0:51820:127.0.0.1:51820?timeout_sec=120"
       - "wss://${WSTUNNEL_SERVER_IP}:${WSTUNNEL_SERVER_PORT:-8080}"
     networks:
       bitmagnet-net:
@@ -36,6 +36,11 @@ services:
       - WIREGUARD_ADDRESSES=10.0.0.2/24
       - DOT=off
       - DNS_ADDRESS=8.8.8.8
+      - WIREGUARD_MTU=1280
+      - WIREGUARD_PERSISTENT_KEEPALIVE_INTERVAL=25s
+      - HEALTH_TARGET_ADDRESS=1.1.1.1:443
+      # 放行宿主机网段，让 bitmagnet 能直连 host Clash (host.docker.internal:7897) 取 TMDB
+      - FIREWALL_OUTBOUND_SUBNETS=192.168.65.0/24
     extra_hosts:
       - "postgres:192.168.55.11"
     restart: always
