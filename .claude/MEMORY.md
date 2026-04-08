@@ -1,0 +1,2 @@
+- [wss 迁移维护](memory/wss_migration.md) — wstunnel ws://→wss:// 迁移记录、密钥位置、Agent 维护提示
+- [DHT 排查经验](memory/dht-troubleshooting.md) — BitMagnet DHT 爬虫架构、分层诊断方法论、bootstrap 节点状态、代理环境陷阱
