@@ -48,3 +48,7 @@ Thumbs.db
 *.pem
 wg0.conf
 wireguard/
+
+# MemPalace (local MCP tool state)
+mempalace.yaml
+entities.json
