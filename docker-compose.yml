@@ -35,10 +35,10 @@ services:
       - WIREGUARD_ENDPOINT_PORT=51820
       - WIREGUARD_ADDRESSES=10.0.0.2/24
       - DOT=off
-      - DNS_ADDRESS=8.8.8.8
+      - DNS_UPSTREAM_PLAIN_ADDRESSES=8.8.8.8:53
       - WIREGUARD_MTU=1280
       - WIREGUARD_PERSISTENT_KEEPALIVE_INTERVAL=25s
-      - HEALTH_TARGET_ADDRESS=1.1.1.1:443
+      - HEALTH_TARGET_ADDRESS=8.8.8.8:53
       # 放行宿主机网段，让 bitmagnet 能直连 host Clash (host.docker.internal:7897) 取 TMDB
       - FIREWALL_OUTBOUND_SUBNETS=192.168.65.0/24
     extra_hosts:
@@ -59,6 +59,7 @@ services:
     volumes:
       - ./data/db:/data/db
       - ./data/bitmagnet:/data/bitmagnet
+      - ./start.sh:/start.sh:ro
     restart: unless-stopped
     environment:
       - POSTGRES_HOST=postgres
@@ -72,7 +73,10 @@ services:
       postgres:
         condition: service_healthy
       gluetun:
-        condition: service_healthy
+        condition: service_started
+    entrypoint:
+      - /bin/sh
+      - /start.sh
     command:
       - worker
       - run
